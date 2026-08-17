@@ -1,0 +1,48 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>إنشاء حساب جديد</title>
+</head>
+<body>
+    <h2>إنشاء حساب جديد</h2>
+    <form method="POST">
+        {% csrf_token %}
+
+        <p>
+            <label for="id_username">اسم المستخدم</label><br>
+            <input type="text" name="username" id="id_username" required>
+            {% if form.username.errors %}
+                <span style="color:red">{{ form.username.errors }}</span>
+            {% endif %}
+        </p>
+
+        <p>
+            <label for="id_email">البريد الإلكتروني</label><br>
+            <input type="email" name="email" id="id_email" required>
+            {% if form.email.errors %}
+                <span style="color:red">{{ form.email.errors }}</span>
+            {% endif %}
+        </p>
+
+        <p>
+            <label for="id_password1">كلمة المرور</label><br>
+            <input type="password" name="password1" id="id_password1" required>
+            <br><small>يجب ألا تقل عن 8 أحرف، ولا تكون أرقامًا فقط أو كلمة شائعة.</small>
+            {% if form.password1.errors %}
+                <br><span style="color:red">{{ form.password1.errors }}</span>
+            {% endif %}
+        </p>
+
+        <p>
+            <label for="id_password2">تأكيد كلمة المرور</label><br>
+            <input type="password" name="password2" id="id_password2" required>
+            {% if form.password2.errors %}
+                <span style="color:red">{{ form.password2.errors }}</span>
+            {% endif %}
+        </p>
+
+        <button type="submit">إنشاء الحساب</button>
+    </form>
+</body>
+</html>

@@ -1,0 +1,20 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>تسجيل الدخول</title>
+</head>
+<body>
+    <h2>تسجيل الدخول</h2>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">دخول</button>
+    </form>
+    {% if error %}
+        <p style="color:red">{{ error }}</p>
+    {% endif %}
+    <p>مستخدم جديد؟ <a href="{% url 'signup' %}">إنشاء حساب</a></p>
+    <p style="font-size: 0.9em;"><a href="{% url 'forgot_password' %}">نسيت كلمة المرور؟</a></p>
+</body>
+</html>
