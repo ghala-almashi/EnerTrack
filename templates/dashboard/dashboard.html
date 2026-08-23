@@ -1,60 +1,95 @@
+{% load static %}
 {% extends "dashboard/base.html" %}
 
 {% block title %}نظام مراقبة الطاقة — الرئيسية{% endblock %}
 
 {% block extra_style %}
-  .devices-section h2{
-    font-size:16px;
-    font-weight:800;
-    margin:0 0 14px;
-    padding:0 4px;
-  }
-  .devices-grid{
+  .dashboard-grid{
     display:flex;
+    gap:16px;
+    align-items:flex-start;
     flex-wrap:wrap;
-    gap:14px;
   }
-  .devices-grid .device-card{
-    flex:1 1 260px;
-  }
-  .device-card{
-    display:flex;
-    align-items:center;
-    gap:14px;
-    text-decoration:none;
-    color:inherit;
-    position:relative;
-    transition:transform .15s ease, box-shadow .15s ease;
-  }
-  .device-card:hover{ transform:translateY(-2px); box-shadow:0 10px 26px rgba(30,30,60,0.09); }
-  .device-card:focus-visible{ outline:2px solid var(--accent-dot); outline-offset:3px; }
-  .device-card .icon-box{
-    flex-shrink:0;
-    width:52px; height:52px;
-    border-radius:15px;
-    background:linear-gradient(135deg, var(--grad-start), var(--grad-end));
-    display:flex; align-items:center; justify-content:center;
-    font-size:23px;
-    box-shadow:0 6px 14px rgba(90,70,220,0.22);
-  }
-  .device-card .info{ min-width:0; flex:1; }
-  .device-card .info h3{
-    font-size:16px; font-weight:800; margin:0 0 3px;
-    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
-  }
-  .device-card .info .sub{ font-size:13px; color:var(--text-secondary); font-weight:500; }
-  .device-card .badge{ flex-shrink:0; }
-  .empty-state{
-    text-align:center;
+  .main-col{ flex:2 1 480px; min-width:0; }
+  .side-col{ flex:1 1 280px; min-width:260px; }
+
+  /* ---------- Alerts table ---------- */
+  .alerts-table-card table{ width:100%; border-collapse:collapse; }
+  .alerts-table-card thead th{
+    text-align:inherit;
+    font-size:12.5px;
+    font-weight:700;
     color:var(--text-secondary);
-    padding:30px 10px;
+    padding:0 4px 12px;
+    border-bottom:1px solid var(--border-color);
+  }
+  .alerts-table-card tbody td{
+    padding:14px 4px;
+    border-bottom:1px solid var(--border-color);
+    font-size:14px;
+  }
+  .alerts-table-card tbody tr:last-child td{ border-bottom:none; }
+  .alerts-table-card .device-cell{ font-weight:700; white-space:nowrap; }
+  .alerts-table-card .alert-cell{ display:flex; align-items:center; gap:8px; color:var(--text-primary); }
+  .dot{ width:8px; height:8px; border-radius:50%; flex-shrink:0; display:inline-block; }
+  .dot-high, .dot-عالي, .dot-حرج{ background:var(--danger); }
+  .dot-medium, .dot-متوسط{ background:var(--warning); }
+  .dot-low, .dot-منخفض{ background:var(--success); }
+
+  /* ---------- Sidebar: alert count ---------- */
+  .alerts-summary-card{ text-align:center; padding:24px 20px; }
+  .alerts-summary-head{
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    font-size:13.5px; font-weight:700; color:var(--text-secondary);
+    margin-bottom:18px;
+  }
+  .alerts-summary-head .icon-circle{ margin-inline-end:2px; }
+  .alerts-summary-number{
+    font-size:44px; font-weight:800; color:var(--grad-end); line-height:1;
+    margin-bottom:8px;
+  }
+  .alerts-summary-label{ font-size:13px; color:var(--text-secondary); font-weight:600; }
+
+  /* ---------- Sidebar: devices list ---------- */
+  .devices-sidebar-head{
+    display:flex; align-items:center; gap:10px;
+    font-size:15px; font-weight:800;
+    margin-bottom:14px;
+  }
+  .devices-sidebar-list{ display:flex; flex-direction:column; }
+  .sidebar-row{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:13px 4px;
+    border-bottom:1px solid var(--border-color);
+    text-decoration:none;
+    color:var(--text-primary);
     font-size:14.5px;
+    font-weight:600;
+  }
+  .sidebar-row:last-child{ border-bottom:none; }
+  .sidebar-row .chevron{ color:var(--text-secondary); font-size:16px; }
+  .sidebar-row:hover{ color:var(--grad-end); }
+  .btn-primary-full{
+    display:block;
+    text-align:center;
+    text-decoration:none;
+    margin-top:16px;
+    padding:13px 16px;
+    border-radius:12px;
+    background:linear-gradient(135deg, var(--grad-start), var(--grad-end));
+    color:#fff;
+    font-weight:700;
+    font-size:14.5px;
+    box-shadow:0 8px 18px rgba(90,70,220,0.25);
   }
 {% endblock %}
 
 {% block content %}
   <div class="header">
-    <h1><span class="live-dot" aria-hidden="true"></span>نظام مراقبة الطاقة</h1>
+    <div class="brand">
+      <img class="brand-logo" src="{% static 'images/logo.jpeg' %}" alt="EnerTrack">
+      <h1><span class="live-dot" aria-hidden="true"></span>نظام مراقبة الطاقة</h1>
+    </div>
     <div class="header-actions">
       {% if total_alerts_count %}
         <span class="alerts-pill">⚠ {{ total_alerts_count }} تنبيه نشط</span>
@@ -65,51 +100,146 @@
     </div>
   </div>
 
-  <section class="card chart-card">
-    <h3>استهلاك الطاقة — الأسبوع الحالي</h3>
-    <div class="bars" id="bars-container"></div>
-  </section>
+  <div class="dashboard-grid">
+    <div class="main-col">
 
-  <section class="devices-section">
-    <h2>الأجهزة</h2>
-    {% if devices_with_alert %}
-      <div class="devices-grid">
-        {% for item in devices_with_alert %}
-          <a class="card device-card" href="{% url 'device_detail' item.device.device_id %}">
-            <div class="icon-box" aria-hidden="true">{{ item.icon }}</div>
-            <div class="info">
-              <h3>{{ item.label }}</h3>
-              <div class="sub">{{ item.device.brand }} {{ item.device.model_name }}</div>
-            </div>
-            {% if item.alert_severity %}
-              <span class="badge badge-{{ item.alert_severity_class }}">⚠ {{ item.alert_severity }}</span>
-            {% endif %}
-          </a>
-        {% endfor %}
-      </div>
-    {% else %}
-      <div class="card empty-state">ما فيه أجهزة مسجّلة بعد.</div>
-    {% endif %}
-  </section>
+      <section class="card alerts-table-card">
+        <table>
+          <thead>
+            <tr>
+              <th>الجهاز</th>
+              <th>التنبيه</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for a in active_alerts %}
+              <tr>
+                <td class="device-cell">{{ a.device_label }}</td>
+                <td class="alert-cell">
+                  <span class="dot dot-{{ a.severity_class }}"></span>{{ a.message }}
+                </td>
+              </tr>
+            {% empty %}
+              <tr><td colspan="2" class="empty-state">لا توجد تنبيهات حالياً</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </section>
+
+      <section class="card chart-card">
+        <h3>
+          <span class="icon-inline" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 9 11 13 15 21 6"></polyline><polyline points="15 6 21 6 21 12"></polyline></svg>
+          </span>
+          التنبؤ باستهلاك الطاقة — الأسبوع القادم
+        </h3>
+        <div class="chart-frame">
+          <div class="y-axis" id="forecast-y-axis"></div>
+          <div class="chart-plot">
+            <div class="gridlines" id="forecast-gridlines"></div>
+            <div class="bars" id="forecast-bars-container"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card chart-card">
+        <h3>
+          <span class="icon-inline" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"></line><line x1="18" y1="20" x2="18" y2="4"></line><line x1="6" y1="20" x2="6" y2="16"></line></svg>
+          </span>
+          استهلاك الطاقة — الأسبوع الحالي
+        </h3>
+        <div class="chart-frame">
+          <div class="y-axis" id="current-y-axis"></div>
+          <div class="chart-plot">
+            <div class="gridlines" id="current-gridlines"></div>
+            <div class="bars" id="bars-container"></div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <div class="side-col">
+
+      <section class="card alerts-summary-card">
+        <div class="alerts-summary-head">
+          <span class="icon-circle" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+          </span>
+          <span>التنبيهات العامة</span>
+        </div>
+        <div class="alerts-summary-number">{{ total_alerts_count|default:0 }}</div>
+        <div class="alerts-summary-label">إجمالي التنبيهات</div>
+      </section>
+
+      <section class="card devices-sidebar-card">
+        <div class="devices-sidebar-head">
+          <span class="icon-circle" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+          </span>
+          <span>الأجهزة</span>
+        </div>
+        <div class="devices-sidebar-list">
+          {% for item in devices_with_alert %}
+            <a class="sidebar-row" href="{% url 'device_detail' item.device.device_id %}">
+              <span>{{ item.label }}</span>
+              <span class="chevron" aria-hidden="true">‹</span>
+            </a>
+          {% empty %}
+            <div class="empty-state">ما فيه أجهزة مسجّلة بعد.</div>
+          {% endfor %}
+        </div>
+        <a class="btn-primary-full" href="{% url 'devices_list' %}">عرض جميع الأجهزة</a>
+      </section>
+
+    </div>
+  </div>
 {% endblock %}
 
 {% block extra_script %}
 <script>
   {{ days|json_script:"weekly-data" }}
+  {{ forecast_days|json_script:"forecast-data" }}
 
-  function renderBars(){
-    const data = JSON.parse(document.getElementById('weekly-data').textContent);
-    const container = document.getElementById('bars-container');
-    container.innerHTML = '';
-    const max = Math.max(1, ...data.map(d => d.energy));
+  function niceMax(values){
+    const max = Math.max(1, ...values);
+    const step = 250;
+    return Math.ceil(max / step) * step || step;
+  }
+
+  function renderChart(barsId, gridId, axisId, data, isForecast){
+    const barsEl = document.getElementById(barsId);
+    const gridEl = document.getElementById(gridId);
+    const axisEl = document.getElementById(axisId);
+    barsEl.innerHTML = '';
+    if (gridEl) gridEl.innerHTML = '';
+    if (axisEl) axisEl.innerHTML = '';
+    if (!data || !data.length) return;
+
+    const max = niceMax(data.map(d => d.energy));
+    const steps = 4;
+    for (let i = steps; i >= 0; i--) {
+      if (axisEl) {
+        const lbl = document.createElement('div');
+        lbl.textContent = Math.round(max * (i / steps));
+        axisEl.appendChild(lbl);
+      }
+      if (gridEl) gridEl.appendChild(document.createElement('div'));
+    }
+    if (axisEl) {
+      const unit = document.createElement('div');
+      unit.textContent = 'kWh';
+      axisEl.prepend(unit);
+    }
 
     data.forEach((d, i) => {
       const col = document.createElement('div');
       col.className = 'bar-col';
 
       const bar = document.createElement('div');
-      bar.className = 'bar';
-      bar.innerHTML = `<span class="bar-value-tip">${d.energy} kW</span>`;
+      bar.className = 'bar' + (isForecast ? ' forecast' : '');
+      bar.innerHTML = `<span class="bar-value-tip">${d.energy} kWh</span>`;
 
       const label = document.createElement('div');
       label.className = 'bar-day';
@@ -117,7 +247,7 @@
 
       col.appendChild(bar);
       col.appendChild(label);
-      container.appendChild(col);
+      barsEl.appendChild(col);
 
       const pct = Math.round((d.energy / max) * 100);
       requestAnimationFrame(() => {
@@ -126,6 +256,10 @@
     });
   }
 
-  renderBars();
+  const currentWeekData = JSON.parse(document.getElementById('weekly-data').textContent || '[]');
+  const forecastData = JSON.parse(document.getElementById('forecast-data').textContent || '[]');
+
+  renderChart('bars-container', 'current-gridlines', 'current-y-axis', currentWeekData, false);
+  renderChart('forecast-bars-container', 'forecast-gridlines', 'forecast-y-axis', forecastData, true);
 </script>
 {% endblock %}
