@@ -1,11 +1,246 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    
-</body>
-</html>
+{% extends "dashboard/_base.html" %}
+
+{% block title %}{{ device_label }} — نظام مراقبة الطاقة{% endblock %}
+
+{% block extra_style %}
+  /* ---------- Alert / normal-status card ---------- */
+  .status-card{
+    position:relative;
+    padding-right:34px;
+    overflow:hidden;
+  }
+  .status-card.is-alert::after{
+    content:"";
+    position:absolute;
+    top:14px; bottom:14px; right:12px;
+    width:6px; border-radius:6px;
+    background:linear-gradient(180deg,#FF5B60,var(--danger));
+  }
+  .status-card.is-normal::after{
+    content:"";
+    position:absolute;
+    top:14px; bottom:14px; right:12px;
+    width:6px; border-radius:6px;
+    background:linear-gradient(180deg,#3FDBA8,var(--success));
+  }
+  .status-top{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:14px;
+  }
+  .status-icon{
+    flex-shrink:0;
+    width:46px; height:46px;
+    border-radius:14px;
+    color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    font-size:22px; font-weight:800;
+  }
+  .status-icon.is-alert{ background:var(--danger); }
+  .status-icon.is-normal{ background:var(--success); }
+  .status-title-block{ min-width:0; flex:1; }
+  .status-badge{
+    display:inline-block;
+    color:#fff;
+    font-size:12px; font-weight:700;
+    padding:4px 12px; border-radius:999px;
+    margin-bottom:10px;
+  }
+  .status-title{ font-size:19px; font-weight:800; margin:0 0 4px; }
+  .status-sub{ font-size:13.5px; color:var(--text-secondary); font-weight:500; }
+  .status-section{ margin-top:16px; }
+  .status-section h4{ font-size:13.5px; font-weight:700; margin:0 0 4px; color:var(--text-primary); }
+  .status-section p{ font-size:14.5px; line-height:1.7; margin:0 0 6px; color:#4A4A5E; }
+  .status-section p:last-child{ margin-bottom:0; }
+
+  /* ---------- Device header ---------- */
+  .device-header{
+    display:flex; align-items:center; justify-content:space-between; gap:14px;
+    padding:0 4px;
+  }
+  .device-header .device-text{ min-width:0; flex:1; }
+  .device-header h2{ font-size:20px; font-weight:800; margin:0 0 4px; }
+  .device-header .sub{ font-size:14px; color:var(--text-secondary); font-weight:500; }
+  .device-icon-box{
+    flex-shrink:0;
+    width:58px; height:58px;
+    border-radius:17px;
+    background:linear-gradient(135deg, var(--grad-start), var(--grad-end));
+    display:flex; align-items:center; justify-content:center;
+    font-size:26px;
+    box-shadow:0 6px 16px rgba(90,70,220,0.25);
+  }
+
+  /* ---------- Stats grid ---------- */
+  .stats-grid{ display:flex; flex-wrap:wrap; gap:14px; }
+  .stats-grid .stat-card{ flex:1 1 calc(50% - 7px); min-width:140px; }
+  .stat-card{ text-align:end; padding:20px 18px; }
+  .stat-label{ font-size:13.5px; color:var(--text-secondary); font-weight:500; margin-bottom:10px; }
+  .stat-value{ font-size:26px; font-weight:800; letter-spacing:.2px; }
+  .stat-value.danger{ color:var(--danger); }
+  .stat-value.warning{ color:var(--warning); }
+  .no-data{ text-align:center; color:var(--text-secondary); padding:20px; }
+
+  /* ---------- Maintenance card ---------- */
+  .maintenance-card{ display:flex; align-items:flex-start; justify-content:space-between; gap:14px; }
+  .maintenance-text{ min-width:0; flex:1; }
+  .maintenance-text h3{ font-size:16.5px; font-weight:800; margin:0 0 8px; }
+  .maintenance-text p{ font-size:14.5px; line-height:1.75; color:#4A4A5E; margin:0; }
+  .info-icon{
+    flex-shrink:0;
+    width:40px; height:40px;
+    border-radius:12px;
+    background:linear-gradient(135deg, var(--info-grad-start), var(--info-grad-end));
+    color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    font-weight:800; font-style:italic; font-size:16px;
+  }
+
+  @media (max-width:380px){
+    .stat-value{ font-size:23px; }
+    .status-title{ font-size:17.5px; }
+  }
+{% endblock %}
+
+{% block content %}
+  <div class="header">
+    <h1><span class="live-dot" aria-hidden="true"></span>نظام مراقبة الطاقة</h1>
+    <a class="link-btn" href="{% url 'dashboard_home' %}">
+      <span>الرجوع للرئيسية</span>
+      <span class="arrow" aria-hidden="true">→</span>
+    </a>
+  </div>
+
+  {% if alert %}
+    <section class="card status-card is-alert">
+      <div class="status-top">
+        <div class="status-icon is-alert" aria-hidden="true">!</div>
+        <div class="status-title-block">
+          <span class="status-badge" style="background:var(--danger)">تنبيه {{ alert.detection.severity }}</span>
+          <h2 class="status-title">{{ explanation.title }}</h2>
+          <div class="status-sub">{{ device.brand }} {{ device.model_name }}</div>
+        </div>
+      </div>
+
+      <div class="status-section">
+        <h4>السبب</h4>
+        {% for cause in explanation.causes %}<p>{{ cause }}</p>{% endfor %}
+      </div>
+
+      <div class="status-section">
+        <h4>التوصية</h4>
+        {% for action in explanation.actions %}<p>{{ action }}</p>{% endfor %}
+      </div>
+    </section>
+  {% else %}
+    <section class="card status-card is-normal">
+      <div class="status-top">
+        <div class="status-icon is-normal" aria-hidden="true">✓</div>
+        <div class="status-title-block">
+          {% if latest_severity == "متوسط" %}
+            <span class="status-badge" style="background:var(--warning)">تحت المراقبة</span>
+            <h2 class="status-title">انحراف بسيط عن النمط المعتاد</h2>
+            <div class="status-sub">{{ device.brand }} {{ device.model_name }}</div>
+          {% else %}
+            <span class="status-badge" style="background:var(--success)">الوضع طبيعي</span>
+            <h2 class="status-title">الجهاز يعمل ضمن النطاق الطبيعي</h2>
+            <div class="status-sub">{{ device.brand }} {{ device.model_name }}</div>
+          {% endif %}
+        </div>
+      </div>
+      {% if latest_severity == "متوسط" %}
+        <div class="status-section">
+          <p>رُصد انحراف طفيف عن نمط الاستهلاك المعتاد لهذا الجهاز. الوضع لا يستدعي تدخلاً فوريًا، لكن يُنصح بمتابعته.</p>
+        </div>
+      {% endif %}
+    </section>
+  {% endif %}
+
+  <div class="device-header">
+    <div class="device-icon-box" aria-hidden="true">{{ device_icon }}</div>
+    <div class="device-text">
+      <h2>{{ device_label }}</h2>
+      <div class="sub">{{ device.brand }} {{ device.model_name }}</div>
+    </div>
+  </div>
+
+  {% if latest_reading %}
+    <div class="stats-grid">
+      <div class="card stat-card">
+        <div class="stat-label">الطاقة الفعلية</div>
+        <div class="stat-value">kW {{ latest_reading.power_kw|floatformat:2 }}</div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-label">درجة الحرارة</div>
+        <div class="stat-value{% if latest_reading.temperature >= 38 %} danger{% endif %}">{{ latest_reading.temperature|floatformat:0 }}°C</div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-label">الجهد</div>
+        <div class="stat-value">{{ latest_reading.voltage|floatformat:0 }}V</div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-label">الكفاءة</div>
+        {% if latest_reading.efficiency_ratio != None %}
+          <div class="stat-value{% if latest_reading.efficiency_ratio < 0.8 %} warning{% endif %}">{% widthratio latest_reading.efficiency_ratio 1 100 %}%</div>
+        {% else %}
+          <div class="stat-value">—</div>
+        {% endif %}
+      </div>
+    </div>
+  {% else %}
+    <div class="card no-data">ما فيه قراءات مسجّلة لهذا الجهاز بعد.</div>
+  {% endif %}
+
+  <section class="card chart-card">
+    <h3>استهلاك الطاقة — الأسبوع الحالي</h3>
+    <div class="bars" id="bars-container"></div>
+  </section>
+
+  {% if recommendation %}
+    <section class="card maintenance-card">
+      <div class="info-icon" aria-hidden="true">i</div>
+      <div class="maintenance-text">
+        <h3>توصية الصيانة الوقائية</h3>
+        <p>{{ recommendation_sentence }}</p>
+      </div>
+    </section>
+  {% endif %}
+{% endblock %}
+
+{% block extra_script %}
+<script>
+  {{ days|json_script:"weekly-data" }}
+
+  function renderBars(){
+    const data = JSON.parse(document.getElementById('weekly-data').textContent);
+    const container = document.getElementById('bars-container');
+    container.innerHTML = '';
+    const max = Math.max(1, ...data.map(d => d.energy));
+
+    data.forEach((d, i) => {
+      const col = document.createElement('div');
+      col.className = 'bar-col';
+
+      const bar = document.createElement('div');
+      bar.className = 'bar';
+      bar.innerHTML = `<span class="bar-value-tip">${d.energy} kW</span>`;
+
+      const label = document.createElement('div');
+      label.className = 'bar-day';
+      label.textContent = d.day;
+
+      col.appendChild(bar);
+      col.appendChild(label);
+      container.appendChild(col);
+
+      const pct = Math.round((d.energy / max) * 100);
+      requestAnimationFrame(() => {
+        setTimeout(() => { bar.style.height = pct + '%'; }, 120 + i * 90);
+      });
+    });
+  }
+
+  renderBars();
+</script>
+{% endblock %}

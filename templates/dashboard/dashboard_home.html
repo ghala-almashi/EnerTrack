@@ -1,0 +1,131 @@
+{% extends "dashboard/_base.html" %}
+
+{% block title %}نظام مراقبة الطاقة — الرئيسية{% endblock %}
+
+{% block extra_style %}
+  .devices-section h2{
+    font-size:16px;
+    font-weight:800;
+    margin:0 0 14px;
+    padding:0 4px;
+  }
+  .devices-grid{
+    display:flex;
+    flex-wrap:wrap;
+    gap:14px;
+  }
+  .devices-grid .device-card{
+    flex:1 1 260px;
+  }
+  .device-card{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    text-decoration:none;
+    color:inherit;
+    position:relative;
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .device-card:hover{ transform:translateY(-2px); box-shadow:0 10px 26px rgba(30,30,60,0.09); }
+  .device-card:focus-visible{ outline:2px solid var(--accent-dot); outline-offset:3px; }
+  .device-card .icon-box{
+    flex-shrink:0;
+    width:52px; height:52px;
+    border-radius:15px;
+    background:linear-gradient(135deg, var(--grad-start), var(--grad-end));
+    display:flex; align-items:center; justify-content:center;
+    font-size:23px;
+    box-shadow:0 6px 14px rgba(90,70,220,0.22);
+  }
+  .device-card .info{ min-width:0; flex:1; }
+  .device-card .info h3{
+    font-size:16px; font-weight:800; margin:0 0 3px;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  .device-card .info .sub{ font-size:13px; color:var(--text-secondary); font-weight:500; }
+  .device-card .badge{ flex-shrink:0; }
+  .empty-state{
+    text-align:center;
+    color:var(--text-secondary);
+    padding:30px 10px;
+    font-size:14.5px;
+  }
+{% endblock %}
+
+{% block content %}
+  <div class="header">
+    <h1><span class="live-dot" aria-hidden="true"></span>نظام مراقبة الطاقة</h1>
+    <div class="header-actions">
+      {% if total_alerts_count %}
+        <span class="alerts-pill">⚠ {{ total_alerts_count }} تنبيه نشط</span>
+      {% endif %}
+      <a class="link-btn" href="{% url 'logout' %}">
+        <span>تسجيل الخروج</span>
+      </a>
+    </div>
+  </div>
+
+  <section class="card chart-card">
+    <h3>استهلاك الطاقة — الأسبوع الحالي</h3>
+    <div class="bars" id="bars-container"></div>
+  </section>
+
+  <section class="devices-section">
+    <h2>الأجهزة</h2>
+    {% if devices_with_alert %}
+      <div class="devices-grid">
+        {% for item in devices_with_alert %}
+          <a class="card device-card" href="{% url 'device_detail' item.device.device_id %}">
+            <div class="icon-box" aria-hidden="true">{{ item.icon }}</div>
+            <div class="info">
+              <h3>{{ item.label }}</h3>
+              <div class="sub">{{ item.device.brand }} {{ item.device.model_name }}</div>
+            </div>
+            {% if item.alert_severity %}
+              <span class="badge badge-{{ item.alert_severity_class }}">⚠ {{ item.alert_severity }}</span>
+            {% endif %}
+          </a>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="card empty-state">ما فيه أجهزة مسجّلة بعد.</div>
+    {% endif %}
+  </section>
+{% endblock %}
+
+{% block extra_script %}
+<script>
+  {{ days|json_script:"weekly-data" }}
+
+  function renderBars(){
+    const data = JSON.parse(document.getElementById('weekly-data').textContent);
+    const container = document.getElementById('bars-container');
+    container.innerHTML = '';
+    const max = Math.max(1, ...data.map(d => d.energy));
+
+    data.forEach((d, i) => {
+      const col = document.createElement('div');
+      col.className = 'bar-col';
+
+      const bar = document.createElement('div');
+      bar.className = 'bar';
+      bar.innerHTML = `<span class="bar-value-tip">${d.energy} kW</span>`;
+
+      const label = document.createElement('div');
+      label.className = 'bar-day';
+      label.textContent = d.day;
+
+      col.appendChild(bar);
+      col.appendChild(label);
+      container.appendChild(col);
+
+      const pct = Math.round((d.energy / max) * 100);
+      requestAnimationFrame(() => {
+        setTimeout(() => { bar.style.height = pct + '%'; }, 120 + i * 90);
+      });
+    });
+  }
+
+  renderBars();
+</script>
+{% endblock %}
