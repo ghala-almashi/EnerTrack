@@ -1,0 +1,255 @@
+{% load static %}<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}نظام مراقبة الطاقة{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  /* ============================================================
+     Design tokens — light theme, matched to the approved mockups
+     (home-page.jpeg for the dashboard, الاجهزة.pdf for device detail)
+     ============================================================ */
+  :root{
+    --bg: #F4F4FA;
+    --card-bg: #FFFFFF;
+
+    --grad-start: #7C6EF2;
+    --grad-end: #5B4FE8;
+
+    /* bar-chart fill (current week): purple → teal, per mockup */
+    --chart-grad-start: #7C6EF2;
+    --chart-grad-end: #34C7DA;
+    /* forecast bars: lighter / stippled, to read as "predicted" */
+    --forecast-fill: #EAE7FC;
+    --forecast-outline: #7C6EF2;
+
+    --accent-dot: #7C6EF2;
+    --info-grad-start: #4FB4E8;
+    --info-grad-end: #3B8FD6;
+
+    --text-primary: #17172E;
+    --text-secondary: #8A8AA3;
+
+    --success: #2ECC8F;
+    --warning: #F5A623;
+    --danger: #EF5354;
+
+    --border-color: rgba(23,23,46,0.07);
+    --shadow-card: 0 4px 18px rgba(30,30,70,0.06);
+  }
+
+  *{ box-sizing:border-box; }
+
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text-primary);
+    font-family:'Tajawal', -apple-system, sans-serif;
+    padding:20px;
+    max-width:1080px;
+    margin-inline:auto;
+  }
+
+  /* ---------- Brand / header ---------- */
+  .header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+    margin-bottom:20px;
+    flex-wrap:wrap;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .brand img.brand-logo{
+    height:28px;
+    width:auto;
+    display:block;
+    border-radius:6px;
+  }
+  .header h1{
+    font-size:19px;
+    font-weight:800;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin:0;
+  }
+  .live-dot{
+    width:9px; height:9px;
+    border-radius:50%;
+    background:var(--success);
+    display:inline-block;
+    box-shadow:0 0 0 0 rgba(46,204,143,.6);
+    animation:pulse 2s infinite;
+  }
+  @keyframes pulse{
+    0%{ box-shadow:0 0 0 0 rgba(46,204,143,.5); }
+    70%{ box-shadow:0 0 0 8px rgba(46,204,143,0); }
+    100%{ box-shadow:0 0 0 0 rgba(46,204,143,0); }
+  }
+  .header-actions{ display:flex; align-items:center; gap:10px; }
+  .alerts-pill{
+    background:rgba(239,83,84,0.1);
+    color:var(--danger);
+    font-size:12.5px;
+    font-weight:700;
+    padding:6px 12px;
+    border-radius:999px;
+  }
+  .link-btn{
+    display:flex; align-items:center; gap:6px;
+    color:var(--text-secondary);
+    text-decoration:none;
+    font-size:13.5px;
+    font-weight:600;
+    padding:8px 14px;
+    border-radius:10px;
+    background:var(--card-bg);
+    border:1px solid var(--border-color);
+    box-shadow:var(--shadow-card);
+    transition:color .15s ease, border-color .15s ease;
+  }
+  .link-btn:hover{ color:var(--text-primary); border-color:var(--grad-start); }
+  .link-btn .arrow{ font-size:14px; }
+
+  /* ---------- Card base ---------- */
+  .card{
+    background:var(--card-bg);
+    border:1px solid var(--border-color);
+    box-shadow:var(--shadow-card);
+    border-radius:18px;
+    padding:20px;
+    margin-bottom:14px;
+  }
+
+  /* ---------- Icon glyphs (inline, no icon font — network is often unavailable) ---------- */
+  .icon-circle{
+    flex-shrink:0;
+    width:34px; height:34px;
+    border-radius:50%;
+    background:linear-gradient(135deg, var(--grad-start), var(--grad-end));
+    display:flex; align-items:center; justify-content:center;
+    color:#fff;
+  }
+  .icon-circle svg{ width:17px; height:17px; }
+  .icon-inline{
+    display:inline-flex;
+    color:var(--grad-end);
+    flex-shrink:0;
+  }
+  .icon-inline svg{ width:18px; height:18px; }
+
+  /* ---------- Bars chart ---------- */
+  .chart-card h3{
+    font-size:15px; font-weight:700; margin:0 0 18px;
+    display:flex; align-items:center; gap:8px;
+  }
+  /* Charts keep left-to-right axis/day order (Sun→Thu) even on this RTL page,
+     matching the dashboard mockup — the axis sits on the left with values
+     descending, same as any standard chart. */
+  .chart-frame{ display:flex; gap:10px; direction:ltr; }
+  .y-axis{
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    padding-bottom:26px;
+    font-size:11px;
+    color:var(--text-secondary);
+    text-align:right;
+  }
+  .chart-plot{ position:relative; flex:1; }
+  .gridlines{
+    position:absolute;
+    inset:0 0 26px 0;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    pointer-events:none;
+  }
+  .gridlines div{ border-top:1px dashed var(--border-color); }
+  .bars{
+    position:relative;
+    z-index:1;
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:8px;
+    height:166px;
+  }
+  .bar-col{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    height:100%;
+    justify-content:flex-end;
+  }
+  .bar{
+    width:100%;
+    max-width:28px;
+    height:0;
+    border-radius:8px 8px 3px 3px;
+    background:linear-gradient(180deg, var(--chart-grad-start), var(--chart-grad-end));
+    position:relative;
+    transition:height .6s ease;
+  }
+  .bar.forecast{
+    background-color:var(--forecast-fill);
+    background-image:radial-gradient(circle, rgba(124,110,242,0.4) 1px, transparent 1.3px);
+    background-size:6px 6px;
+    border:1.5px dashed var(--forecast-outline);
+    border-bottom:none;
+  }
+  .bar-value-tip{
+    position:absolute;
+    top:-20px;
+    left:50%;
+    transform:translateX(-50%);
+    font-size:10.5px;
+    color:var(--text-secondary);
+    white-space:nowrap;
+  }
+  .bar-day{
+    margin-top:8px;
+    font-size:11.5px;
+    color:var(--text-secondary);
+    font-weight:600;
+  }
+
+  /* ---------- Badges ---------- */
+  .badge{
+    display:inline-block;
+    font-size:11.5px;
+    font-weight:700;
+    padding:4px 10px;
+    border-radius:999px;
+    background:rgba(239,83,84,0.1);
+    color:var(--danger);
+  }
+  .badge-عالي, .badge-high, .badge-حرج, .badge-critical{ background:rgba(239,83,84,0.1); color:var(--danger); }
+  .badge-متوسط, .badge-medium{ background:rgba(245,166,35,0.14); color:var(--warning); }
+  .badge-منخفض, .badge-low, .badge-طبيعي, .badge-normal{ background:rgba(46,204,143,0.12); color:var(--success); }
+
+  .empty-state{
+    text-align:center;
+    color:var(--text-secondary);
+    padding:30px 10px;
+    font-size:14.5px;
+  }
+</style>
+
+<style>
+{% block extra_style %}{% endblock %}
+</style>
+</head>
+<body>
+{% block content %}{% endblock %}
+{% block extra_script %}{% endblock %}
+</body>
+</html>
