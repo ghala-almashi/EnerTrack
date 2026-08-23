@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}نظام مراقبة الطاقة{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0F0F1A;
+    --card-bg: #1A1A2E;
+    --grad-start: #7C6EF2;
+    --grad-end: #5B4FE8;
+    --accent-dot: #7C6EF2;
+    --info-grad-start: #4FB4E8;
+    --info-grad-end: #3B8FD6;
+    --text-primary: #F2F2F7;
+    --text-secondary: #9A9AB0;
+    --success: #2ECC8F;
+    --warning: #F5A623;
+    --danger: #FF5B60;
+    --border-color: rgba(255,255,255,0.06);
+  }
+
+  *{ box-sizing:border-box; }
+
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text-primary);
+    font-family:'Tajawal', -apple-system, sans-serif;
+    padding:20px;
+    max-width:760px;
+    margin-inline:auto;
+  }
+
+  /* ---------- Header ---------- */
+  .header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+    margin-bottom:20px;
+    flex-wrap:wrap;
+  }
+  .header h1{
+    font-size:19px;
+    font-weight:800;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin:0;
+  }
+  .live-dot{
+    width:9px; height:9px;
+    border-radius:50%;
+    background:var(--success);
+    display:inline-block;
+    box-shadow:0 0 0 0 rgba(46,204,143,.6);
+    animation:pulse 2s infinite;
+  }
+  @keyframes pulse{
+    0%{ box-shadow:0 0 0 0 rgba(46,204,143,.5); }
+    70%{ box-shadow:0 0 0 8px rgba(46,204,143,0); }
+    100%{ box-shadow:0 0 0 0 rgba(46,204,143,0); }
+  }
+  .header-actions{ display:flex; align-items:center; gap:10px; }
+  .alerts-pill{
+    background:rgba(255,91,96,0.12);
+    color:var(--danger);
+    font-size:12.5px;
+    font-weight:700;
+    padding:6px 12px;
+    border-radius:999px;
+  }
+  .link-btn{
+    display:flex; align-items:center; gap:6px;
+    color:var(--text-secondary);
+    text-decoration:none;
+    font-size:13.5px;
+    font-weight:600;
+    padding:8px 14px;
+    border-radius:10px;
+    background:var(--card-bg);
+    border:1px solid var(--border-color);
+    transition:color .15s ease, border-color .15s ease;
+  }
+  .link-btn:hover{ color:var(--text-primary); border-color:var(--grad-start); }
+  .link-btn .arrow{ font-size:14px; }
+
+  /* ---------- Card base ---------- */
+  .card{
+    background:var(--card-bg);
+    border:1px solid var(--border-color);
+    border-radius:18px;
+    padding:20px;
+    margin-bottom:14px;
+  }
+
+  /* ---------- Bars chart ---------- */
+  .chart-card h3{ font-size:15px; font-weight:700; margin:0 0 18px; }
+  .bars{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:8px;
+    height:140px;
+  }
+  .bar-col{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    height:100%;
+    justify-content:flex-end;
+  }
+  .bar{
+    width:100%;
+    max-width:26px;
+    height:0;
+    border-radius:8px 8px 3px 3px;
+    background:linear-gradient(180deg, var(--grad-start), var(--grad-end));
+    position:relative;
+    transition:height .6s ease;
+  }
+  .bar-value-tip{
+    position:absolute;
+    top:-20px;
+    left:50%;
+    transform:translateX(-50%);
+    font-size:10.5px;
+    color:var(--text-secondary);
+    white-space:nowrap;
+  }
+  .bar-day{
+    margin-top:8px;
+    font-size:11.5px;
+    color:var(--text-secondary);
+    font-weight:600;
+  }
+
+  /* ---------- Badges ---------- */
+  .badge{
+    display:inline-block;
+    font-size:11.5px;
+    font-weight:700;
+    padding:4px 10px;
+    border-radius:999px;
+    background:rgba(255,91,96,0.12);
+    color:var(--danger);
+  }
+  .badge-عالي, .badge-high{ background:rgba(255,91,96,0.12); color:var(--danger); }
+  .badge-متوسط, .badge-medium{ background:rgba(245,166,35,0.14); color:var(--warning); }
+  .badge-منخفض, .badge-low{ background:rgba(46,204,143,0.14); color:var(--success); }
+
+  .empty-state{
+    text-align:center;
+    color:var(--text-secondary);
+    padding:30px 10px;
+    font-size:14.5px;
+  }
+</style>
+{% block extra_style %}{% endblock %}
+</head>
+<body>
+{% block content %}{% endblock %}
+{% block extra_script %}{% endblock %}
+</body>
+</html>

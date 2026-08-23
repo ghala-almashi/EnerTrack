@@ -6,4 +6,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     # path('dashboard/', dashboard_view, name='dashboard'),
     path('dashboard/', include('dashboard.urls')),
+    path('accounts/', include('accounts.urls'))
 ]
