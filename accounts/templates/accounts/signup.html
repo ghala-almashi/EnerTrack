@@ -2,47 +2,372 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>إنشاء حساب جديد</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>إنشاء حساب | EnerTrack</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg: #F4F4FA;
+            --card-bg: #FFFFFF;
+            --primary: #7C6EF2;
+            --primary-dark: #5B4FE8;
+            --text: #17172E;
+            --muted: #8A8AA3;
+            --border: rgba(23, 23, 46, 0.10);
+            --danger: #EF5354;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            padding: 24px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background:
+                radial-gradient(
+                    circle at top right,
+                    rgba(124, 110, 242, 0.13),
+                    transparent 35%
+                ),
+                var(--bg);
+
+            color: var(--text);
+            font-family: 'Tajawal', sans-serif;
+        }
+
+        .page-container {
+            width: 100%;
+            max-width: 460px;
+        }
+
+        .brand {
+            text-align: center;
+            margin-bottom: 22px;
+        }
+
+        .brand-name {
+            margin: 0;
+            font-size: 30px;
+            font-weight: 800;
+            color: var(--primary-dark);
+        }
+
+        .brand-subtitle {
+            margin: 6px 0 0;
+            color: var(--muted);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            padding: 34px;
+
+            box-shadow: 0 12px 35px rgba(30, 30, 70, 0.08);
+        }
+
+        .icon {
+            width: 58px;
+            height: 58px;
+            margin: 0 auto 18px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 50%;
+
+            background: rgba(124, 110, 242, 0.10);
+            color: var(--primary-dark);
+
+            font-size: 25px;
+        }
+
+        h1 {
+            margin: 0;
+            text-align: center;
+
+            font-size: 24px;
+            font-weight: 800;
+        }
+
+        .description {
+            margin: 9px 0 28px;
+
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.8;
+
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .form-group input {
+            width: 100%;
+            height: 48px;
+            padding: 0 14px;
+
+            border: 1px solid var(--border);
+            border-radius: 12px;
+
+            background: #FAFAFD;
+            color: var(--text);
+
+            font-family: 'Tajawal', sans-serif;
+            font-size: 14px;
+
+            outline: none;
+
+            transition:
+                border-color 0.2s ease,
+                box-shadow 0.2s ease,
+                background 0.2s ease;
+        }
+
+        .form-group input:focus {
+            background: #FFFFFF;
+            border-color: var(--primary);
+
+            box-shadow: 0 0 0 4px rgba(124, 110, 242, 0.12);
+        }
+
+        .help-text {
+            display: block;
+            margin-top: 7px;
+
+            color: var(--muted);
+            font-size: 11.5px;
+            line-height: 1.7;
+        }
+
+        .field-error {
+            display: block;
+            margin-top: 6px;
+
+            color: var(--danger);
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .submit-button {
+            width: 100%;
+            height: 50px;
+            margin-top: 4px;
+
+            border: none;
+            border-radius: 12px;
+
+            background: linear-gradient(
+                135deg,
+                var(--primary),
+                var(--primary-dark)
+            );
+
+            color: #FFFFFF;
+
+            font-family: 'Tajawal', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+
+            cursor: pointer;
+
+            box-shadow: 0 8px 18px rgba(90, 70, 220, 0.24);
+
+            transition:
+                transform 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+        .submit-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 11px 22px rgba(90, 70, 220, 0.30);
+        }
+
+        .submit-button:active {
+            transform: translateY(0);
+        }
+
+        .login-text {
+            margin: 24px 0 0;
+            padding-top: 20px;
+
+            border-top: 1px solid var(--border);
+
+            text-align: center;
+
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .login-text a {
+            color: var(--primary-dark);
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .login-text a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 16px;
+            }
+
+            .card {
+                padding: 25px 20px;
+                border-radius: 18px;
+            }
+
+            .brand-name {
+                font-size: 27px;
+            }
+
+            h1 {
+                font-size: 22px;
+            }
+        }
+    </style>
 </head>
+
 <body>
-    <h2>إنشاء حساب جديد</h2>
-    <form method="POST">
-        {% csrf_token %}
 
-        <p>
-            <label for="id_username">اسم المستخدم</label><br>
-            <input type="text" name="username" id="id_username" required>
-            {% if form.username.errors %}
-                <span style="color:red">{{ form.username.errors }}</span>
-            {% endif %}
-        </p>
+    <main class="page-container">
 
-        <p>
-            <label for="id_email">البريد الإلكتروني</label><br>
-            <input type="email" name="email" id="id_email" required>
-            {% if form.email.errors %}
-                <span style="color:red">{{ form.email.errors }}</span>
-            {% endif %}
-        </p>
+        <div class="brand">
+            <h2 class="brand-name">EnerTrack</h2>
+            <p class="brand-subtitle">نظام مراقبة الطاقة</p>
+        </div>
 
-        <p>
-            <label for="id_password1">كلمة المرور</label><br>
-            <input type="password" name="password1" id="id_password1" required>
-            <br><small>يجب ألا تقل عن 8 أحرف، ولا تكون أرقامًا فقط أو كلمة شائعة.</small>
-            {% if form.password1.errors %}
-                <br><span style="color:red">{{ form.password1.errors }}</span>
-            {% endif %}
-        </p>
+        <section class="card">
 
-        <p>
-            <label for="id_password2">تأكيد كلمة المرور</label><br>
-            <input type="password" name="password2" id="id_password2" required>
-            {% if form.password2.errors %}
-                <span style="color:red">{{ form.password2.errors }}</span>
-            {% endif %}
-        </p>
+            <div class="icon" aria-hidden="true">
+                ✦
+            </div>
 
-        <button type="submit">إنشاء الحساب</button>
-    </form>
+            <h1>إنشاء حساب جديد</h1>
+
+            <p class="description">
+                أنشئ حسابك للوصول إلى نظام مراقبة الطاقة.
+            </p>
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="id_username">اسم المستخدم</label>
+
+                    <input
+                        type="text"
+                        name="username"
+                        id="id_username"
+                        required
+                        autocomplete="username"
+                    >
+
+                    {% if form.username.errors %}
+                        <span class="field-error">
+                            {{ form.username.errors }}
+                        </span>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="id_email">البريد الإلكتروني</label>
+
+                    <input
+                        type="email"
+                        name="email"
+                        id="id_email"
+                        required
+                        autocomplete="email"
+                    >
+
+                    {% if form.email.errors %}
+                        <span class="field-error">
+                            {{ form.email.errors }}
+                        </span>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="id_password1">كلمة المرور</label>
+
+                    <input
+                        type="password"
+                        name="password1"
+                        id="id_password1"
+                        required
+                        autocomplete="new-password"
+                    >
+
+                    <small class="help-text">
+                        يجب ألا تقل عن 8 أحرف، ولا تكون أرقامًا فقط أو كلمة شائعة.
+                    </small>
+
+                    {% if form.password1.errors %}
+                        <span class="field-error">
+                            {{ form.password1.errors }}
+                        </span>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="id_password2">تأكيد كلمة المرور</label>
+
+                    <input
+                        type="password"
+                        name="password2"
+                        id="id_password2"
+                        required
+                        autocomplete="new-password"
+                    >
+
+                    {% if form.password2.errors %}
+                        <span class="field-error">
+                            {{ form.password2.errors }}
+                        </span>
+                    {% endif %}
+                </div>
+
+                <button type="submit" class="submit-button">
+                    إنشاء الحساب
+                </button>
+            </form>
+
+            <p class="login-text">
+                لديك حساب بالفعل؟
+                <a href="{% url 'login' %}">تسجيل الدخول</a>
+            </p>
+
+        </section>
+
+    </main>
+
 </body>
 </html>
