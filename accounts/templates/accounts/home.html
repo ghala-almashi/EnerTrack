@@ -2,11 +2,219 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>الصفحة الرئيسية</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>الرئيسية | EnerTrack</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg: #F4F4FA;
+            --card-bg: #FFFFFF;
+            --primary: #7C6EF2;
+            --primary-dark: #5B4FE8;
+            --text: #17172E;
+            --muted: #8A8AA3;
+            --border: rgba(23, 23, 46, 0.10);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            padding: 24px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background:
+                radial-gradient(
+                    circle at top right,
+                    rgba(124, 110, 242, 0.13),
+                    transparent 35%
+                ),
+                var(--bg);
+
+            color: var(--text);
+            font-family: 'Tajawal', sans-serif;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 520px;
+        }
+
+        .brand {
+            text-align: center;
+            margin-bottom: 22px;
+        }
+
+        .brand-name {
+            margin: 0;
+            color: var(--primary-dark);
+            font-size: 30px;
+            font-weight: 800;
+        }
+
+        .brand-subtitle {
+            margin: 6px 0 0;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .card {
+            padding: 40px 34px;
+            background: var(--card-bg);
+
+            border: 1px solid var(--border);
+            border-radius: 22px;
+
+            box-shadow: 0 12px 35px rgba(30, 30, 70, 0.08);
+
+            text-align: center;
+        }
+
+        .welcome-icon {
+            width: 68px;
+            height: 68px;
+            margin: 0 auto 20px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 50%;
+
+            background: rgba(124, 110, 242, 0.10);
+            color: var(--primary-dark);
+
+            font-size: 30px;
+        }
+
+        h1 {
+            margin: 0 0 10px;
+
+            font-size: 26px;
+            font-weight: 800;
+        }
+
+        .welcome-text {
+            margin: 0 0 28px;
+
+            color: var(--muted);
+            font-size: 15px;
+            line-height: 1.8;
+        }
+
+        .username {
+            color: var(--primary-dark);
+            font-weight: 800;
+        }
+
+        .dashboard-button {
+            display: block;
+            width: 100%;
+
+            padding: 14px 20px;
+
+            border-radius: 12px;
+
+            background: linear-gradient(
+                135deg,
+                var(--primary),
+                var(--primary-dark)
+            );
+
+            color: #FFFFFF;
+            text-decoration: none;
+
+            font-size: 15px;
+            font-weight: 700;
+
+            box-shadow: 0 8px 18px rgba(90, 70, 220, 0.24);
+
+            transition: 0.2s ease;
+        }
+
+        .dashboard-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 11px 22px rgba(90, 70, 220, 0.30);
+        }
+
+        .logout-link {
+            display: inline-block;
+            margin-top: 20px;
+
+            color: var(--muted);
+            text-decoration: none;
+
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .logout-link:hover {
+            color: var(--primary-dark);
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 16px;
+            }
+
+            .card {
+                padding: 30px 20px;
+                border-radius: 18px;
+            }
+
+            .brand-name {
+                font-size: 27px;
+            }
+
+            h1 {
+                font-size: 23px;
+            }
+        }
+    </style>
 </head>
+
 <body>
-    <h2>أهلاً {{ user.username }} 🎉</h2>
-    <p>تسجيل الدخول شغال تمام!</p>
-    <a href="{% url 'logout' %}">تسجيل خروج</a>
+
+    <main class="container">
+
+        <div class="brand">
+            <h2 class="brand-name">EnerTrack</h2>
+            <p class="brand-subtitle">نظام مراقبة الطاقة</p>
+        </div>
+
+        <section class="card">
+
+            <div class="welcome-icon" aria-hidden="true">
+                ✓
+            </div>
+
+            <h1>
+                أهلاً {{ user.username }} 🎉
+            </h1>
+
+            <p class="welcome-text">
+                تم تسجيل الدخول بنجاح.
+                يمكنك الآن الوصول إلى نظام EnerTrack.
+            </p>
+
+            <a href="{% url 'logout' %}" class="dashboard-button">
+                تسجيل الخروج
+            </a>
+
+        </section>
+
+    </main>
+
 </body>
-</html> 
+</html>
