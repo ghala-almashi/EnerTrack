@@ -1,5 +1,6 @@
-{% load static %}
 {% extends "dashboard/base.html" %}
+
+{% load static %}
 
 {% block title %}نظام مراقبة الطاقة — الرئيسية{% endblock %}
 
@@ -87,7 +88,7 @@
 {% block content %}
   <div class="header">
     <div class="brand">
-      <img class="brand-logo" src="{% static 'images/logo.jpeg' %}" alt="EnerTrack">
+<img class = "logo" src="{% static 'dashboard/image/logo.jpeg' %}" alt="EnerTrack Logo">
       <h1><span class="live-dot" aria-hidden="true"></span>نظام مراقبة الطاقة</h1>
     </div>
     <div class="header-actions">
@@ -190,7 +191,6 @@
             <div class="empty-state">ما فيه أجهزة مسجّلة بعد.</div>
           {% endfor %}
         </div>
-        <a class="btn-primary-full" href="{% url 'devices_list' %}">عرض جميع الأجهزة</a>
       </section>
 
     </div>

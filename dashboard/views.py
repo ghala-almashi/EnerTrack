@@ -10,7 +10,7 @@ from .models import Device, Alert, DeviceReading
 def dashboard_view(request):
     # اجمالي التنبيهات
     all_alerts = Alert.objects.all()
-    total_alerts_count = all_alerts.count()
+    total_alerts_count = Alert.objects.exclude(status='closed').count()
 
     #ملخص الاجهزه مع التنبيهات
     latest_devices = Device.objects.order_by('-device_id')[:4]
