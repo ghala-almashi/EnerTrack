@@ -25,7 +25,7 @@ def login_view(request):
             user = authenticate(request, username=username, password=password) if username else None
             if user is not None:
                 login(request, user)
-                return redirect('home')
+                return redirect('dashboard_home')
             else:
                 return render(request, 'accounts/login.html', {'form': form, 'error': 'البريد الإلكتروني أو كلمة المرور غير صحيحة'})
     else:
