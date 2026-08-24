@@ -1,85 +1,129 @@
-from django.shortcuts import render
-from django.db.models import Avg
-from django.utils import timezone
+from django.shortcuts import render, get_object_or_404
+from django.db.models import Avg, Max
 from datetime import timedelta
-from .models import Forecast
-import random
-
-from .models import Device, Alert, DeviceReading
+from .models import Device, Alert, DeviceReading, Forecast, MaintenanceRecommendation
 
 def dashboard_view(request):
-    # اجمالي التنبيهات
-    all_alerts = Alert.objects.all()
-    total_alerts_count = Alert.objects.exclude(status='closed').count()
+    # 1. جلب أحدث تاريخ قراءة ناتج عن المحاكاة
+    latest_reading_time = DeviceReading.objects.aggregate(Max('timestamp'))['timestamp__max']
+    
+    # فلترة التنبيهات النشطة المرتبطة بآخر قراءات المحاكاة فقط (مثلاً خلال آخر ساعة من قراءات المحاكاة)
+    if latest_reading_time:
+        cutoff_time = latest_reading_time - timedelta(hours=1)
+        active_alerts_qs = Alert.objects.filter(
+            status='open',
+            detection__reading__timestamp__gte=cutoff_time
+        ).select_related('detection__reading__device').order_by('-detection__reading__timestamp')
+    else:
+        active_alerts_qs = Alert.objects.none()
 
-    #ملخص الاجهزه مع التنبيهات
-    latest_devices = Device.objects.order_by('-device_id')[:4]
-
-    devices_with_alert = []
-    for device in latest_devices:
-        device_alerts = Alert.objects.filter(detection__reading__device=device)
-        random_alert = random.choice(list(device_alerts)) if device_alerts.exists() else None
-        devices_with_alert.append({
-            'device': device,
-            'alert': random_alert,
-            'alert_severity': random_alert.detection.severity if random_alert else None,
+    total_alerts_count = active_alerts_qs.count()
+    
+    # 2. أحدث 5 تنبيهات ناتجة عن المحاكاة
+    active_alerts = []
+    for alert in active_alerts_qs[:5]:
+        device = alert.detection.reading.device
+        severity = alert.detection.severity
+        
+        severity_class = 'high' if severity in ['حرج', 'عالي'] else ('medium' if severity == 'متوسط' else 'low')
+            
+        active_alerts.append({
+            'device_label': f"{device.device_type} ({device.device_id})",
+            'message': f"ارتفاع في الاستهلاك / شذوذ ({severity})",
+            'severity_class': severity_class
         })
 
-    # استهلاك الطاقة الاسبوعي
+    # 3. الأجهزة لشريط SideBar
+    all_devices = Device.objects.all()[:6]
+    devices_with_alert = [
+        {'device': d, 'label': f"{d.device_type} - {d.brand} ({d.device_id})"}
+        for d in all_devices
+    ]
+
+    # 4. حساب استهلاك الأيام السبعة الأخيرة
     arabic_days = {
         'Sunday': 'الأحد', 'Monday': 'الإثنين', 'Tuesday': 'الثلاثاء',
         'Wednesday': 'الأربعاء', 'Thursday': 'الخميس',
         'Friday': 'الجمعة', 'Saturday': 'السبت',
     }
 
-    today = timezone.now().date()
-    start_date = today - timedelta(days=(today.weekday() + 1) % 7)
-
     days = []
-    for i in range(7):
-        current_date = start_date + timedelta(days=i)
+    if latest_reading_time:
+        end_date = latest_reading_time.date()
+        for i in range(6, -1, -1):
+            target_date = end_date - timedelta(days=i)
+            avg_power = DeviceReading.objects.filter(
+                timestamp__date=target_date
+            ).aggregate(avg=Avg('power_kw'))['avg']
+            
+            day_name = arabic_days.get(target_date.strftime('%A'), target_date.strftime('%A'))
+            days.append({
+                'day': day_name,
+                'energy': round(avg_power, 2) if avg_power else 0
+            })
 
-        avg_power = DeviceReading.objects.filter(
-            timestamp__date=current_date
-        ).aggregate(avg=Avg('power_kw'))['avg']
-
-        day_name_en = current_date.strftime('%A')
-        days.append({
-            'day': arabic_days[day_name_en],
-            'energy': round(avg_power, 2) if avg_power else 0,
-        })
+    # 5. التنبؤ بالأسبوع القادم
+    forecast_qs = Forecast.objects.order_by('target_date')[:7]
+    forecast_days = [
+        {
+            'day': arabic_days.get(f.target_date.strftime('%A'), f.target_date.strftime('%A')),
+            'energy': round(f.p50, 2)
+        }
+        for f in forecast_qs
+    ]
 
     context = {
         'total_alerts_count': total_alerts_count,
-        'all_alerts': all_alerts,
+        'active_alerts': active_alerts,
         'devices_with_alert': devices_with_alert,
         'days': days,
+        'forecast_days': forecast_days,
     }
     return render(request, 'dashboard/dashboard.html', context)
 
-# device detailes
-from django.shortcuts import get_object_or_404
-from .models import Alert, Device, DeviceReading, MaintenanceRecommendation
 
 def device_detail_view(request, device_id):
-  device = get_object_or_404(Device, device_id=device_id)
+    device = get_object_or_404(Device, device_id=device_id)
 
-  latest_reading = (
-      DeviceReading.objects.filter(device=device).order_by('-timestamp').first()
-  )
+    # أحدث قراءة للجهاز
+    latest_reading = DeviceReading.objects.filter(device=device).order_by('-timestamp').first()
 
-  latest_reading_id = latest_reading.reading_id if latest_reading else None
-  alert = Alert.objects.filter(detection__reading_id=latest_reading_id).first()
-  recommendation = (
-      MaintenanceRecommendation.objects.filter(alert=alert).first()
-      if alert
-      else None
-  )
+    # التنبيه والمقترحات
+    alert = Alert.objects.filter(detection__reading__device=device, status='open').order_by('-detection__reading__timestamp').first()
+    recommendation = MaintenanceRecommendation.objects.filter(alert=alert).first() if alert else None
 
-  context = {
-      'device': device,
-      'latest_reading': latest_reading,
-      'alert': alert,
-      'recommendation': recommendation,
-  }
-  return render(request, 'dashboard/device_detail.html', context)
+    # حساب استهلاك الأسبوع الحالي للجهاز
+    arabic_days = {
+        'Sunday': 'الأحد', 'Monday': 'الإثنين', 'Tuesday': 'الثلاثاء',
+        'Wednesday': 'الأربعاء', 'Thursday': 'الخميس',
+        'Friday': 'الجمعة', 'Saturday': 'السبت',
+    }
+
+    days = []
+    if latest_reading:
+        end_date = latest_reading.timestamp.date()
+        for i in range(6, -1, -1):
+            target_date = end_date - timedelta(days=i)
+            avg_power = DeviceReading.objects.filter(
+                device=device,
+                timestamp__date=target_date
+            ).aggregate(avg=Avg('power_kw'))['avg']
+            
+            day_name = arabic_days.get(target_date.strftime('%A'), target_date.strftime('%A'))
+            days.append({
+                'day': day_name,
+                'energy': round(avg_power, 2) if avg_power else 0
+            })
+
+    context = {
+        'device': device,
+        'device_label': f"{device.device_type} ({device.device_id})",
+        'device_icon': '⚡',
+        'latest_reading': latest_reading,
+        'alert': alert,
+        'latest_severity': alert.detection.severity if alert else 'طبيعي',
+        'recommendation': recommendation,
+        'recommendation_sentence': recommendation.action_required if recommendation else '',
+        'days': days,
+    }
+    return render(request, 'dashboard/device_detail.html', context)
