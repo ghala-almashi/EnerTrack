@@ -73,7 +73,13 @@
     </div>
     <div class="header-actions">
       <span class="alerts-pill" id="live-alerts-pill">⚠ {{ total_alerts_count }} تنبيه نشط</span>
-      <a class="link-btn" href="{% url 'login' %}"><span>تسجيل الدخول</span></a>
+     {% if user.is_authenticated %}
+    <span class="link-btn">مرحبًا {{ user.username }}</span>
+{% else %}
+    <a class="link-btn" href="{% url 'login' %}">
+        <span>تسجيل الدخول</span>
+    </a>
+{% endif %}
     </div>
   </div>
 
