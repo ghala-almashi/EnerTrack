@@ -2,7 +2,9 @@ from django.shortcuts import render, get_object_or_404
 from django.db.models import Avg, Max
 from datetime import timedelta
 from .models import Device, Alert, DeviceReading, Forecast, MaintenanceRecommendation
+from django.contrib.auth.decorators import login_required
 
+@login_required
 def dashboard_view(request):
     # 1. جلب أحدث تاريخ قراءة ناتج عن المحاكاة
     latest_reading_time = DeviceReading.objects.aggregate(Max('timestamp'))['timestamp__max']
