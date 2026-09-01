@@ -25,7 +25,7 @@ def login_view(request):
             user = authenticate(request, username=username, password=password) if username else None
             if user is not None:
                 login(request, user)
-                return redirect('home')
+                return redirect('dashboard_home')
             else:
                 return render(request, 'accounts/login.html', {'form': form, 'error': 'البريد الإلكتروني أو كلمة المرور غير صحيحة'})
     else:
@@ -49,7 +49,7 @@ def signup_view(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            return redirect('home')
+            return redirect('dashboard_home')
     else:
         form = SignUpForm()
     return render(request, 'accounts/signup.html', {'form': form})

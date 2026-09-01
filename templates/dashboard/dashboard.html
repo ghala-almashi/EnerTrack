@@ -63,17 +63,72 @@
     height: 250px;
     margin-top: 15px;
   }
+/* قائمة المستخدم */
+.user-menu {
+  position: relative;
+}
+
+.user-menu-btn {
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.user-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 140px;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  box-shadow: var(--shadow-card);
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.user-dropdown.show {
+  display: block;
+}
+
+.user-dropdown a {
+  display: block;
+  padding: 10px 14px;
+  color: var(--text-primary);
+  text-decoration: none;
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.user-dropdown a:hover {
+  background: var(--bg);
+  color: var(--danger);
+}
 {% endblock %}
 
 {% block content %}
   <div class="header">
     <div class="brand">
-      <img class="logo" src="{% static 'dashboard/image/logo.jpeg' %}" alt="EnerTrack Logo">
+      <img class="logo" src="{% static 'dashboard/image/logo.png' %}" alt="EnerTrack Logo">
       <h1><span class="live-dot" aria-hidden="true"></span>نظام مراقبة الطاقة (بث مباشر)</h1>
     </div>
     <div class="header-actions">
       <span class="alerts-pill" id="live-alerts-pill">⚠ {{ total_alerts_count }} تنبيه نشط</span>
-      <a class="link-btn" href="{% url 'logout' %}"><span>تسجيل الخروج</span></a>
+    {% if user.is_authenticated %}
+    <div class="user-menu">
+        <button class="link-btn user-menu-btn" type="button" onclick="toggleUserMenu()">
+            مرحبًا {{ user.username }}
+        </button>
+
+        <div class="user-dropdown" id="userDropdown">
+            <a href="{% url 'logout' %}">تسجيل الخروج</a>
+        </div>
+    </div>
+{% else %}
+    <a class="link-btn" href="{% url 'login' %}">
+        <span>تسجيل الدخول</span>
+    </a>
+{% endif %}
     </div>
   </div>
 
@@ -195,5 +250,8 @@
     setTimeout(function(){
        window.location.reload();
     }, 4000);
+    function toggleUserMenu() {
+    document.getElementById("userDropdown").classList.toggle("show");
+}
   </script>
 {% endblock %}

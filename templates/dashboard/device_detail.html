@@ -42,7 +42,7 @@
       <h1><span class="live-dot" aria-hidden="true"></span>نظام مراقبة الطاقة</h1>
     </div>
     <!-- تم تصحيح اسم المسار هنا إلى 'dashboard' -->
-    <a class="link-btn" href="{% url 'dashboard' %}">
+    <a class="link-btn" href="{% url 'dashboard_home' %}">
       <span>الرجوع للرئيسية</span>
       <span class="arrow" aria-hidden="true">→</span>
     </a>
@@ -58,13 +58,13 @@
     <div class="device-icon-box">{{ device_icon }}</div>
   </div>
 
-  {% if alert %}
+{% if alert %}
     <section class="card status-card">
       <div class="status-row">
-        <div class="status-icon is-alert-critical">!</div>
+        <div class="status-icon {% if latest_severity == 'حرج' or latest_severity == 'عالي' %}is-alert-critical{% else %}is-watch{% endif %}">!</div>
         <div>
-          <h3>تنبيه: {{ alert.detection.severity }}</h3>
-          <p>رُصد انحراف في أداء هذا الجهاز بناءً على بيانات المحاكاة الحية.</p>
+          <h3>تنبيه: {{ latest_severity }}</h3>
+          <p>رُصد شذوذ أو ارتفاع في استهلاك الطاقة لهذا الجهاز (تنبيه نشط من نظام المحاكاة).</p>
         </div>
       </div>
     </section>
@@ -114,11 +114,11 @@
   </section>
 
   {% if recommendation %}
-    <section class="card maintenance-card" style="margin-top:16px; padding:16px;">
-      <h3>توصية الصيانة الوقائية</h3>
-      <p>{{ recommendation_sentence }}</p>
-    </section>
-  {% endif %}
+  <section class="card maintenance-card" style="margin-top:16px; padding:16px; background:#fff; border-radius:12px;">
+    <h3 style="margin-top:0; color:#17172E;">توصية الصيانة الوقائية</h3>
+    <p style="color:#5A5A72; line-height:1.7;">{{ recommendation_sentence|default:recommendation.action }}</p>
+  </section>
+{% endif %}
 
   {{ days|json_script:"device-weekly-data" }}
 
