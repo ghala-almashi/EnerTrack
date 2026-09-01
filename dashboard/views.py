@@ -4,18 +4,29 @@ from datetime import timedelta
 from .models import Device, Alert, DeviceReading, Forecast, MaintenanceRecommendation
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
+from django.db.models import Avg, Max, Count, Q
 
 @login_required
 def dashboard_view(request):
     # 1. جلب أحدث تاريخ قراءة ناتج عن المحاكاة
     latest_reading_time = DeviceReading.objects.aggregate(Max('timestamp'))['timestamp__max']
+
+    all_devices = Device.objects.annotate(
+    open_alerts_count=Count(
+        'readings__anomalydetection__alert',
+        filter=Q(readings__anomalydetection__alert__status='open')
+    )
+    ).order_by('-open_alerts_count', 'device_id')
+    device_ids = [d.device_id for d in all_devices]
     
     # فلترة التنبيهات النشطة المرتبطة بآخر قراءات المحاكاة فقط (مثلاً خلال آخر ساعة من قراءات المحاكاة)
     if latest_reading_time:
         cutoff_time = latest_reading_time - timedelta(hours=1)
         active_alerts_qs = Alert.objects.filter(
             status='open',
-            detection__reading__timestamp__gte=cutoff_time
+            detection__reading__timestamp__gte=cutoff_time,
+            detection__reading__device__device_id__in=device_ids
+
         ).select_related('detection__reading__device').order_by('-detection__reading__timestamp')
     else:
         active_alerts_qs = Alert.objects.none()
@@ -37,13 +48,15 @@ def dashboard_view(request):
         })
 
     # 3. الأجهزة لشريط SideBar
-    all_devices = Device.objects.all()[:6]
     devices_with_alert = [
-        {'device': d, 'label': f"{d.device_type} - {d.brand} ({d.device_id})"}
-        for d in all_devices
-    ]
+    {
+        'device': d,
+        'label': f"{d.device_type} - {d.brand} ({d.device_id})",
+        'alert_count': d.open_alerts_count
+    }
+    for d in all_devices
+]
 
-    # 4. حساب استهلاك الأيام السبعة الأخيرة
     arabic_days = {
         'Sunday': 'الأحد', 'Monday': 'الإثنين', 'Tuesday': 'الثلاثاء',
         'Wednesday': 'الأربعاء', 'Thursday': 'الخميس',

@@ -5,253 +5,275 @@
 
 {% block extra_style %}
 .devices-sidebar-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 10px;
+display: flex;
+flex-direction: column;
+gap: 8px;
+margin-top: 10px;
+max-height: 480px;
+overflow-y: auto;
 }
 
 .sidebar-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 14px;
-  background: var(--bg);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  color: var(--text-primary);
-  text-decoration: none;
-  font-weight: 700;
-  font-size: 14px;
-  transition: all 0.2s ease;
+display: flex;
+align-items: center;
+justify-content: space-between;
+padding: 12px 14px;
+background: var(--bg);
+border: 1px solid var(--border-color);
+border-radius: 12px;
+color: var(--text-primary);
+text-decoration: none;
+font-weight: 700;
+font-size: 14px;
+transition: all 0.2s ease;
 }
 
 .sidebar-row:hover {
-  background: #ffffff;
-  border-color: var(--grad-start);
-  box-shadow: var(--shadow-card);
-  transform: translateX(-3px);
+background: #ffffff;
+border-color: var(--grad-start);
+box-shadow: var(--shadow-card);
+transform: translateX(-3px);
 }
 
 .sidebar-row .chevron {
-  color: var(--text-secondary);
-  font-size: 16px;
+color: var(--text-secondary);
+font-size: 16px;
 }
-  .dashboard-grid{ display:flex; gap:16px; align-items:flex-start; flex-wrap:wrap; }
-  .main-col{ flex:2 1 480px; min-width:0; }
-  .side-col{ flex:1 1 280px; min-width:260px; }
 
-  .alerts-table-card table{ width:100%; border-collapse:collapse; }
-  .alerts-table-card thead th{
-    text-align:inherit; font-size:12.5px; font-weight:700;
-    color:var(--text-secondary); padding:0 4px 12px; border-bottom:1px solid var(--border-color);
-  }
-  .alerts-table-card tbody td{ padding:14px 4px; border-bottom:1px solid var(--border-color); font-size:14px; }
-  .alerts-table-card .device-cell{ font-weight:700; white-space:nowrap; }
-  .alerts-table-card .alert-cell{ display:flex; align-items:center; gap:8px; color:var(--text-primary); }
-  .dot{ width:8px; height:8px; border-radius:50%; flex-shrink:0; display:inline-block; }
-  .dot-high{ background:red; }
-  .dot-medium{ background:orange; }
-  .dot-low{ background:green; }
+.alert-count-badge {
+background: var(--danger);
+color: #fff;
+font-size: 11px;
+font-weight: 800;
+min-width: 20px;
+height: 20px;
+border-radius: 999px;
+display: inline-flex;
+align-items: center;
+justify-content: center;
+padding: 0 6px;
+margin-inline-start: 6px;
+}
+.dashboard-grid{ display:flex; gap:16px; align-items:flex-start; flex-wrap:wrap; }
+.main-col{ flex:2 1 480px; min-width:0; }
+.side-col{ flex:1 1 280px; min-width:260px; }
 
-  .alerts-summary-card{ text-align:center; padding:24px 20px; }
-  .alerts-summary-number{ font-size:44px; font-weight:800; color:#4f46e5; line-height:1; margin-bottom:8px; }
+.alerts-table-card table{ width:100%; border-collapse:collapse; }
+.alerts-table-card thead th{
+text-align:inherit; font-size:12.5px; font-weight:700;
+color:var(--text-secondary); padding:0 4px 12px; border-bottom:1px solid var(--border-color);
+}
+.alerts-table-card tbody td{ padding:14px 4px; border-bottom:1px solid var(--border-color); font-size:14px; }
+.alerts-table-card .device-cell{ font-weight:700; white-space:nowrap; }
+.alerts-table-card .alert-cell{ display:flex; align-items:center; gap:8px; color:var(--text-primary); }
+.dot{ width:8px; height:8px; border-radius:50%; flex-shrink:0; display:inline-block; }
+.dot-high{ background:red; }
+.dot-medium{ background:orange; }
+.dot-low{ background:green; }
 
-  .chart-box {
-    position: relative;
-    width: 100%;
-    height: 250px;
-    margin-top: 15px;
-  }
+.alerts-summary-card{ text-align:center; padding:24px 20px; }
+.alerts-summary-number{ font-size:44px; font-weight:800; color:#4f46e5; line-height:1; margin-bottom:8px; }
+
+.chart-box {
+position: relative;
+width: 100%;
+height: 250px;
+margin-top: 15px;
+}
 /* قائمة المستخدم */
 .user-menu {
-  position: relative;
+position: relative;
 }
 
 .user-menu-btn {
-  cursor: pointer;
-  font-family: inherit;
+cursor: pointer;
+font-family: inherit;
 }
 
 .user-dropdown {
-  display: none;
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 0;
-  min-width: 140px;
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 10px;
-  box-shadow: var(--shadow-card);
-  z-index: 1000;
-  overflow: hidden;
+display: none;
+position: absolute;
+top: calc(100% + 6px);
+left: 0;
+min-width: 140px;
+background: var(--card-bg);
+border: 1px solid var(--border-color);
+border-radius: 10px;
+box-shadow: var(--shadow-card);
+z-index: 1000;
+overflow: hidden;
 }
 
 .user-dropdown.show {
-  display: block;
+display: block;
 }
 
 .user-dropdown a {
-  display: block;
-  padding: 10px 14px;
-  color: var(--text-primary);
-  text-decoration: none;
-  font-size: 13.5px;
-  font-weight: 600;
+display: block;
+padding: 10px 14px;
+color: var(--text-primary);
+text-decoration: none;
+font-size: 13.5px;
+font-weight: 600;
 }
 
 .user-dropdown a:hover {
-  background: var(--bg);
-  color: var(--danger);
+background: var(--bg);
+color: var(--danger);
 }
 {% endblock %}
 
 {% block content %}
-  <div class="header">
-    <div class="brand">
-      <img class="logo" src="{% static 'dashboard/image/logo.png' %}" alt="EnerTrack Logo">
-      <h1><span class="live-dot" aria-hidden="true"></span>نظام مراقبة الطاقة (بث مباشر)</h1>
-    </div>
-    <div class="header-actions">
-      <span class="alerts-pill" id="live-alerts-pill">⚠ {{ total_alerts_count }} تنبيه نشط</span>
+<div class="header">
+  <div class="brand">
+    <img class="logo" src="{% static 'dashboard/image/logo.png' %}" alt="EnerTrack Logo">
+    <h1><span class="live-dot" aria-hidden="true"></span>نظام مراقبة الطاقة (بث مباشر)</h1>
+  </div>
+  <div class="header-actions">
+    <span class="alerts-pill" id="live-alerts-pill">⚠ {{ total_alerts_count }} تنبيه نشط</span>
     {% if user.is_authenticated %}
     <div class="user-menu">
-        <button class="link-btn user-menu-btn" type="button" onclick="toggleUserMenu()">
-            مرحبًا {{ user.username }}
-        </button>
+      <button class="link-btn user-menu-btn" type="button" onclick="toggleUserMenu()">
+        مرحبًا {{ user.username }}
+      </button>
 
-        <div class="user-dropdown" id="userDropdown">
-            <a href="{% url 'logout' %}">تسجيل الخروج</a>
-        </div>
+      <div class="user-dropdown" id="userDropdown">
+        <a href="{% url 'logout' %}">تسجيل الخروج</a>
+      </div>
     </div>
-{% else %}
+    {% else %}
     <a class="link-btn" href="{% url 'login' %}">
-        <span>تسجيل الدخول</span>
+      <span>تسجيل الدخول</span>
     </a>
-{% endif %}
-    </div>
+    {% endif %}
+  </div>
+</div>
+
+<div class="dashboard-grid">
+  <div class="main-col">
+
+    <!-- جدول تنبيهات المحاكاة الحية -->
+    <section class="card alerts-table-card">
+      <h3>🚨 أحدث تنبيهات المحاكاة الحية</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>الجهاز</th>
+            <th>التنبيه</th>
+          </tr>
+        </thead>
+        <tbody id="alerts-tbody">
+          {% for a in active_alerts %}
+          <tr>
+            <td class="device-cell">{{ a.device_label }}</td>
+            <td class="alert-cell">
+              <span class="dot dot-{{ a.severity_class }}"></span>{{ a.message }}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="2" class="empty-state">لا توجد تنبيهات حالياً من المحاكاة</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+
+    <!-- مخطط التنبؤ -->
+    <section class="card chart-card">
+      <h3>📈 التنبؤ باستهلاك الطاقة — الأسبوع القادم</h3>
+      <div class="chart-box">
+        <canvas id="forecastEnergyChart"></canvas>
+      </div>
+    </section>
+
+    <!-- مخطط الاستهلاك الحالي -->
+    <section class="card chart-card">
+      <h3>📊 استهلاك الطاقة — الأسبوع الحالي</h3>
+      <div class="chart-box">
+        <canvas id="currentEnergyChart"></canvas>
+      </div>
+    </section>
+
   </div>
 
-  <div class="dashboard-grid">
-    <div class="main-col">
+  <div class="side-col">
 
-      <!-- جدول تنبيهات المحاكاة الحية -->
-      <section class="card alerts-table-card">
-        <h3>🚨 أحدث تنبيهات المحاكاة الحية</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>الجهاز</th>
-              <th>التنبيه</th>
-            </tr>
-          </thead>
-          <tbody id="alerts-tbody">
-            {% for a in active_alerts %}
-              <tr>
-                <td class="device-cell">{{ a.device_label }}</td>
-                <td class="alert-cell">
-                  <span class="dot dot-{{ a.severity_class }}"></span>{{ a.message }}
-                </td>
-              </tr>
-            {% empty %}
-              <tr><td colspan="2" class="empty-state">لا توجد تنبيهات حالياً من المحاكاة</td></tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </section>
+    <section class="card alerts-summary-card">
+      <div class="alerts-summary-head"><span>التنبيهات العامة</span></div>
+      <div class="alerts-summary-number" id="live-total-alerts">{{ total_alerts_count|default:0 }}</div>
+      <div class="alerts-summary-label">إجمالي التنبيهات النشطة</div>
+    </section>
 
-      <!-- مخطط التنبؤ -->
-      <section class="card chart-card">
-        <h3>📈 التنبؤ باستهلاك الطاقة — الأسبوع القادم</h3>
-        <div class="chart-box">
-          <canvas id="forecastEnergyChart"></canvas>
-        </div>
-      </section>
+    <section class="card devices-sidebar-card">
+      <div class="devices-sidebar-head"><span>الأجهزة المراقبة</span></div>
+      <div class="devices-sidebar-list">
+        {% for item in devices_with_alert %}
+        <!-- رابط ينقل لصفحة قراءات الجهاز بجميع محتوياتها -->
+        <a class="sidebar-row" href="{% url 'device_detail' item.device.device_id %}">
+          {% if item.alert_count > 0 %}
+          <span class="alert-count-badge">{{ item.alert_count }}</span>
+          {% endif %}
+          <span>{{ item.label }}</span>
+          <span class="chevron">›</span>
+        </a>
+        {% empty %}
+        <div class="empty-state">لا توجد أجهزة متوفرة حالياً.</div>
+        {% endfor %}
+      </div>
+    </section>
 
-      <!-- مخطط الاستهلاك الحالي -->
-      <section class="card chart-card">
-        <h3>📊 استهلاك الطاقة — الأسبوع الحالي</h3>
-        <div class="chart-box">
-          <canvas id="currentEnergyChart"></canvas>
-        </div>
-      </section>
-
-    </div>
-
-    <div class="side-col">
-
-      <section class="card alerts-summary-card">
-        <div class="alerts-summary-head"><span>التنبيهات العامة</span></div>
-        <div class="alerts-summary-number" id="live-total-alerts">{{ total_alerts_count|default:0 }}</div>
-        <div class="alerts-summary-label">إجمالي التنبيهات النشطة</div>
-      </section>
-
-<section class="card devices-sidebar-card">
-  <div class="devices-sidebar-head"><span>الأجهزة المراقبة</span></div>
-  <div class="devices-sidebar-list">
-    {% for item in devices_with_alert %}
-      <!-- رابط ينقل لصفحة قراءات الجهاز بجميع محتوياتها -->
-      <a class="sidebar-row" href="{% url 'device_detail' item.device.device_id %}">
-        <span>{{ item.label }}</span>
-        <span class="chevron">‹</span>
-      </a>
-    {% empty %}
-      <div class="empty-state">لا توجد أجهزة متوفرة حالياً.</div>
-    {% endfor %}
   </div>
-</section>
+</div>
 
-    </div>
-  </div>
+{{ days|json_script:"days-data" }}
+{{ forecast_days|json_script:"forecast-data" }}
 
-  {{ days|json_script:"days-data" }}
-  {{ forecast_days|json_script:"forecast-data" }}
+<!-- تحميل مكتبة Chart.js مباشرةً -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  // 1. رسم المخطط البياني للاستهلاك الحالي
+  const daysData = JSON.parse(document.getElementById('days-data').textContent || '[]');
+  const currentCtx = document.getElementById('currentEnergyChart').getContext('2d');
+  new Chart(currentCtx, {
+    type: 'bar',
+    data: {
+      labels: daysData.map(d => d.day),
+      datasets: [{
+        label: 'الاستهلاك (kWh)',
+        data: daysData.map(d => d.energy),
+        backgroundColor: '#3b82f6',
+        borderRadius: 6
+      }]
+    },
+    options: { responsive: true, maintainAspectRatio: false }
+  });
 
-  <!-- تحميل مكتبة Chart.js مباشرةً -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script>
-    // 1. رسم المخطط البياني للاستهلاك الحالي
-    const daysData = JSON.parse(document.getElementById('days-data').textContent || '[]');
-    const currentCtx = document.getElementById('currentEnergyChart').getContext('2d');
-    new Chart(currentCtx, {
-      type: 'bar',
-      data: {
-        labels: daysData.map(d => d.day),
-        datasets: [{
-          label: 'الاستهلاك (kWh)',
-          data: daysData.map(d => d.energy),
-          backgroundColor: '#3b82f6',
-          borderRadius: 6
-        }]
-      },
-      options: { responsive: true, maintainAspectRatio: false }
-    });
+  // 2. رسم المخطط البياني للتنبؤات
+  const forecastData = JSON.parse(document.getElementById('forecast-data').textContent || '[]');
+  const forecastCtx = document.getElementById('forecastEnergyChart').getContext('2d');
+  new Chart(forecastCtx, {
+    type: 'line',
+    data: {
+      labels: forecastData.map(f => f.day),
+      datasets: [{
+        label: 'التنبؤ (kWh)',
+        data: forecastData.map(f => f.energy),
+        borderColor: '#8b5cf6',
+        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+        fill: true,
+        tension: 0.3
+      }]
+    },
+    options: { responsive: true, maintainAspectRatio: false }
+  });
 
-    // 2. رسم المخطط البياني للتنبؤات
-    const forecastData = JSON.parse(document.getElementById('forecast-data').textContent || '[]');
-    const forecastCtx = document.getElementById('forecastEnergyChart').getContext('2d');
-    new Chart(forecastCtx, {
-      type: 'line',
-      data: {
-        labels: forecastData.map(f => f.day),
-        datasets: [{
-          label: 'التنبؤ (kWh)',
-          data: forecastData.map(f => f.energy),
-          borderColor: '#8b5cf6',
-          backgroundColor: 'rgba(139, 92, 246, 0.1)',
-          fill: true,
-          tension: 0.3
-        }]
-      },
-      options: { responsive: true, maintainAspectRatio: false }
-    });
-
-    // 3. تحديث الصفحة ريل-تايم تلقائياً كل 4 ثوانٍ لرؤية تنبيهات المحاكاة تتغير
-    setTimeout(function(){
-       window.location.reload();
-    }, 4000);
-    function toggleUserMenu() {
+  // 3. تحديث الصفحة ريل-تايم تلقائياً كل 4 ثوانٍ لرؤية تنبيهات المحاكاة تتغير
+  setTimeout(function () {
+    window.location.reload();
+  }, 4000);
+  function toggleUserMenu() {
     document.getElementById("userDropdown").classList.toggle("show");
-}
-  </script>
+  }
+</script>
 {% endblock %}

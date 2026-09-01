@@ -41,19 +41,19 @@
       <img class="brand-logo" src="{% static 'dashboard/image/logo.png' %}" alt="EnerTrack" style="height:40px;">
       <h1><span class="live-dot" aria-hidden="true"></span>نظام مراقبة الطاقة</h1>
     </div>
-    <!-- تم تصحيح اسم المسار هنا إلى 'dashboard' -->
+
     <a class="link-btn" href="{% url 'dashboard_home' %}">
       <span>الرجوع للرئيسية</span>
-      <span class="arrow" aria-hidden="true">→</span>
+      <span class="arrow" aria-hidden="true">←</span>
     </a>
   </div>
 
   <div class="device-header">
     <div class="device-text">
       <h2>{{ device_label }}</h2>
-      <div class="sub">
-        {{ device.brand }} {{ device.model_name }}{% if not alert %} · جميع القراءات ضمن النطاق الطبيعي{% endif %}
-      </div>
+      <!-- <div class="sub">
+        {{device.device_id }} {% if not alert %} · جميع القراءات ضمن النطاق الطبيعي{% endif %}
+      </div> -->
     </div>
     <div class="device-icon-box">{{ device_icon }}</div>
   </div>
